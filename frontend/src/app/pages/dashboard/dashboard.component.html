@@ -1,0 +1,146 @@
+<div class="dashboard">
+  <header class="dashboard-header">
+    <h1>Análisis de Hipótesis</h1>
+    <span class="badge">Módulo Estadístico</span>
+  </header>
+
+  <!-- CONTROL DE PARÁMETROS -->
+  <section class="control-panel">
+    <h2>Configuración del Experimento</h2>
+    <div class="form-grid">
+      <div class="field">
+        <label>Tipo de prueba</label>
+        <select [(ngModel)]="testConfig.type" (change)="changeMode(testConfig.type)">
+          <option value="one">Una Media</option>
+          <option value="two">Dos Medias</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Nivel de Significancia (α)</label>
+        <input type="number" step="0.01" [(ngModel)]="testConfig.alpha">
+      </div>
+
+      <div class="field">
+        <label>Tamaño Muestral (n)</label>
+        <input type="number" [(ngModel)]="testConfig.sampleSize">
+      </div>
+
+      <div class="field">
+        <label>Media Esperada (μ₀)</label>
+        <input type="number" [(ngModel)]="testConfig.populationMean" (change)="updateHypothesis()">
+      </div>
+
+      <div class="field">
+        <label>Hipótesis Alternativa</label>
+        <select [(ngModel)]="testConfig.alternative" (change)="updateHypothesis()">
+          <option value="different">Diferente (≠)</option>
+          <option value="less">Menor (&lt;)</option>
+          <option value="greater">Mayor (&gt;</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="hypothesis-banner">
+      <div class="h-statement">{{h0}}</div>
+      <div class="h-statement accent">{{h1}}</div>
+    </div>
+
+    <button class="btn-primary" (click)="executeTest()" [disabled]="loading">
+      {{ loading ? 'Procesando...' : 'Calcular Métricas' }}
+    </button>
+  </section>
+
+  <!-- VISUALIZACIÓN GRÁFICA -->
+  <section class="analytics-chart" *ngIf="result?.chart">
+    <h2>Distribución de Frecuencias / Muestras</h2>
+    <div class="chart-wrapper">
+      <canvas #chartCanvas></canvas>
+    </div>
+  </section>
+
+  <!-- FLUJO CRUDO DE DATOS -->
+  <section class="data-stream" *ngIf="result?.chart">
+    <h2>Vectores de Datos Recolectados</h2>
+    <div class="stream-container">
+      <div class="stream-row">
+        <span class="stream-label">Vector A</span>
+        <div class="stream-code">{{ result.chart.apiA.join(' , ') }}</div>
+      </div>
+      <div class="stream-row" *ngIf="testConfig.type === 'two' && result.chart.apiB?.length > 0">
+        <span class="stream-label">Vector B</span>
+        <div class="stream-code code-blue">{{ result.chart.apiB.join(' , ') }}</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MATRIZ DE MEDIDAS DESCRIPTIVAS -->
+  <section class="metrics-matrix" *ngIf="result && formulaList.length > 0">
+    <h2>Matriz de Componentes Descriptivos</h2>
+    
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Medida Estadística</th>
+            <th>Estructura Algebraica</th>
+            <th>Sustitución Aritmética</th>
+            <th class="text-right">Valor Resultante</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Iteramos solo las medidas descriptivas filtrando el estadístico T para ponerlo aparte -->
+          <ng-container *ngFor="let item of formulaList">
+            <tr *ngIf="!item.name.includes('Estadístico')">
+              <td class="font-bold text-dark">{{ item.name }}</td>
+              <td><code class="math-code">{{ item.formula }}</code></td>
+              <td><code class="sub-code">{{ item.substitution }}</code></td>
+              <td class="text-right font-mono font-bold">{{ item.result }}</td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- CÁLCULO CRÍTICO: SEPARADO POR COMPLETO -->
+    <ng-container *ngFor="let item of formulaList">
+      <div class="test-statistic-box" *ngIf="item.name.includes('Estadístico')">
+        <div class="stat-header">
+          <h3>{{ item.name }}</h3>
+          <span class="stat-badge">Cálculo de Decisión</span>
+        </div>
+        <div class="stat-body">
+          <div class="stat-item">
+            <span class="stat-label">Modelo matemático utilizado</span>
+            <code class="math-code large">{{ item.formula }}</code>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Reemplazo de valores</span>
+            <code class="sub-code large">{{ item.substitution }}</code>
+          </div>
+          <div class="stat-result-block">
+            <span class="stat-label">Valor Crítico Hallado (t)</span>
+            <div class="stat-huge-number">{{ item.result }}</div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </section>
+
+  <!-- CONCLUSIÓN FINAL -->
+  <section class="final-report" *ngIf="result?.decision">
+    <h2>Informe Clínico de la Prueba</h2>
+    <div class="report-grid">
+      <div class="report-meta">
+        <div class="meta-row"><span>H₀ Planificada:</span> <strong>{{ result.decision.h0 }}</strong></div>
+        <div class="meta-row"><span>H₁ Planificada:</span> <strong>{{ result.decision.h1 }}</strong></div>
+        <div class="meta-row"><span>Nivel Significancia (α):</span> <strong>{{ result.decision.alpha }}</strong></div>
+        <div class="meta-row highlight"><span>Valor de Probabilidad (p-value):</span> <strong>{{ result.decision.pValue }}</strong></div>
+      </div>
+      <div class="report-verdict">
+        <span class="verdict-title">Dictamen del Test</span>
+        <p class="verdict-text">{{ result.decision.result }}</p>
+      </div>
+    </div>
+  </section>
+</div>
