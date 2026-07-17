@@ -1,29 +1,60 @@
 /* ==========================================================================
-   SISTEMA DE DISEÑO HIGH-CLARITY
+   SISTEMA DE DISEÑO HIGH-CLARITY (MODO OSCURO - AZUL NOCHE & CELESTE)
    ========================================================================== */
 :host {
-  --bg-workspace: #f4f6f9;
-  --bg-surface: #ffffff;
-  --text-main: #1e293b;
-  --text-muted: #64748b;
-  --border-light: #e2e8f0;
-  
-  --brand-primary: #0f172a; /* Slate oscuro corporativo */
-  --brand-accent: #2563eb;  /* Azul eléctrico enfocado */
-  --brand-accent-bg: #eff6ff;
-  
-  --color-success: #059669;
-  --color-success-bg: #ecfdf5;
+  /* Fondos de pantalla y contenedores */
+  --bg-workspace: #070d19;
+  /* Azul noche profundo */
+  --bg-surface: #0f172a;
+  /* Slate oscuro para secciones y tarjetas */
+  --border-light: #1e293b;
+  /* Bordes sutiles oscuros */
+
+  /* Tipografía */
+  --text-main: #f8fafc;
+  /* Blanco puro/gris ultraclaro para legibilidad */
+  --text-muted: #94a3b8;
+  /* Gris slate para textos secundarios */
+
+  /* Identidad y Acentos (Celeste) */
+  --brand-primary: #38bdf8;
+  /* Celeste brillante */
+  --brand-accent: #00d2ff;
+  /* Celeste neón eléctrico */
+  --brand-accent-bg: rgba(0, 210, 255, 0.08);
+  /* Fondo celeste traslúcido */
+
+  /* Estados (Éxito y Error) */
+  --color-success: #10b981;
+  /* Verde esmeralda para aciertos */
+  --color-success-bg: rgba(16, 185, 129, 0.08);
+  --color-error: #ef4444;
+  /* Rojo vibrante para discrepancias/errores */
+  --color-error-bg: rgba(239, 68, 68, 0.08);
+
+  /* Paleta Light Celestial (Inspirada en Estadísticos Clave para Fórmulas) */
+  --light-bg-glass: rgba(255, 255, 255, 0.85);
+  --light-bg-hover: rgba(255, 255, 255, 0.95);
+  --light-border: rgba(255, 255, 255, 0.6);
+  --light-text-primary: #0f172a;
+  --light-text-secondary: #334155;
+  --light-text-muted: #64748b;
+  --light-accent: #0284c7;
 }
 
 .dashboard {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 30px 20px;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 30px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   color: var(--text-main);
   background-color: var(--bg-workspace);
   min-height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 /* HEADER CLEAN */
@@ -31,7 +62,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 30px;
   border-bottom: 2px solid var(--border-light);
   padding-bottom: 16px;
 }
@@ -39,14 +69,28 @@
 .dashboard-header h1 {
   font-size: 26px;
   font-weight: 800;
-  color: var(--brand-primary);
+  color: var(--text-main);
   margin: 0;
   letter-spacing: -0.02em;
 }
 
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
 .badge {
   background: var(--brand-primary);
-  color: #fff;
+  color: #070d19;
   font-size: 11px;
   font-weight: 700;
   padding: 6px 12px;
@@ -54,13 +98,23 @@
   text-transform: uppercase;
 }
 
-/* BLOQUES CONTENEDORES */
+/* BLOQUES CONTENEDORES (CARDS) */
 section {
   background: var(--bg-surface);
   border: 1px solid var(--border-light);
   border-radius: 12px;
   padding: 24px;
-  margin-bottom: 24px;
+  box-sizing: border-box;
+  /* 
+     CORRECCIÓN 1: Asegura que si una fórmula dentro de un 'section' activa un tooltip,
+     el section pase a tener un plano prioritario temporal sobre los demás sections.
+  */
+  position: relative;
+  transition: z-index 0.2s ease;
+}
+
+section:hover {
+  z-index: 10; /* Eleva ligeramente la sección que se está interactuando */
 }
 
 section h2 {
@@ -80,6 +134,7 @@ section h2 {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 16px;
+  margin-bottom: 24px;
 }
 
 .field {
@@ -94,95 +149,247 @@ section h2 {
   color: var(--text-muted);
 }
 
-input, select {
+input,
+select {
   padding: 10px 14px;
   border-radius: 8px;
   border: 1px solid var(--border-light);
-  background: #f8fafc;
+  background: #1e293b;
   font-size: 14px;
   color: var(--text-main);
   outline: none;
+  height: 42px;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
 }
 
-input:focus, select:focus {
+input:focus,
+select:focus {
   border-color: var(--brand-accent);
-  background: #fff;
+  background: #1e293b;
+  box-shadow: 0 0 0 3px rgba(0, 210, 255, 0.15);
 }
 
+/* BANNER DE HIPÓTESIS */
 .hypothesis-banner {
-  margin-top: 20px;
-  background: #f8fafc;
-  border-left: 4px solid var(--brand-primary);
-  padding: 14px 20px;
   display: flex;
-  gap: 30px;
-  border-radius: 0 8px 8px 0;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .h-statement {
+  flex: 1;
+  background: #1e293b;
+  border-left: 4px solid var(--brand-primary);
+  padding: 14px 20px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0 8px 8px 0;
+}
+
+.hyp-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: bold;
+}
+
+.hyp-value {
   font-family: monospace;
   font-size: 16px;
   font-weight: 700;
   color: var(--text-main);
+  margin-top: 4px;
 }
 
 .h-statement.accent {
+  border-left-color: var(--brand-accent);
+}
+
+.text-accent {
   color: var(--brand-accent);
 }
 
+/* BOTONES */
 .btn-primary {
-  margin-top: 20px;
-  padding: 12px 30px;
+  width: 100%;
+  padding: 14px;
   background: var(--brand-accent);
-  color: #fff;
+  color: #070d19;
   border: none;
   border-radius: 8px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: all 0.2s;
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
   opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
 }
 
-/* VECTORES DE DATOS */
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* VISUALIZACIÓN GRÁFICA */
+.chart-wrapper {
+  height: 350px;
+  position: relative;
+  width: 100%;
+}
+
+/* VECTORES DE DATOS / CHIPS */
+.data-stream {
+  padding: 24px;
+}
+
 .stream-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.stream-block {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.stream-row {
+.stream-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+  padding-bottom: 8px;
+}
+
+.stream-badge-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--brand-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 6px;
 }
 
-.stream-label {
-  font-size: 12px;
-  font-weight: 700;
+.stream-badge-title::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: var(--brand-primary);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--brand-primary);
+}
+
+.stream-badge-title.accent-b {
+  color: var(--brand-accent);
+}
+
+.stream-badge-title.accent-b::before {
+  background-color: var(--brand-accent);
+  box-shadow: 0 0 8px var(--brand-accent);
+}
+
+.stream-count-badge {
+  font-size: 11px;
+  font-weight: 600;
   color: var(--text-muted);
-  width: 70px;
-  text-transform: uppercase;
+  background: #1e293b;
+  padding: 3px 8px;
+  border-radius: 4px;
 }
 
-.stream-code {
-  flex: 1;
-  font-family: monospace;
-  font-size: 12px;
-  background: #f1f5f9;
-  padding: 8px 12px;
+.stream-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 8px;
+  background: #020617;
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border-light);
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Scrollbar sutil para la consola */
+.stream-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.stream-grid::-webkit-scrollbar-track {
+  background: #020617;
+  border-radius: 10px;
+}
+
+.stream-grid::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+}
+
+.data-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #111e36;
+  border: 1px solid rgba(56, 189, 248, 0.1);
+  padding: 6px 10px;
   border-radius: 6px;
-  white-space: nowrap;
-  overflow-x: auto;
-  color: #334155;
+  font-family: 'Fira Code', 'SF Mono', Consolas, monospace;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.data-chip:hover {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: #10b981;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.25);
+  transform: translateY(-2px);
+}
+
+.chip-index {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.chip-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.stream-grid.accent-b .data-chip {
+  border-color: rgba(191, 68, 239, 0.1);
+}
+
+.stream-grid.accent-b .data-chip:hover {
+  background: rgba(191, 68, 239, 0.12);
+  border-color: #bf44ef;
+  box-shadow: 0 0 10px rgba(191, 68, 239, 0.25);
+  transform: translateY(-2px);
 }
 
 /* TABLA PRESTIGE (MATRIZ DE MEDIDAS) */
 .table-responsive {
+  width: 100%;
   overflow-x: auto;
-  margin-bottom: 30px;
+  margin-bottom: 24px;
+  /* 
+     CORRECCIÓN 2: Si el tooltip está dentro de una tabla horizontal, 
+     el overflow-x ocultará el tooltip que sobresale hacia arriba. 
+     Cambiamos a 'visible' temporalmente al pasar el ratón.
+  */
+}
+
+.table-responsive:hover {
+  overflow-x: visible;
 }
 
 .data-table {
@@ -192,7 +399,7 @@ input:focus, select:focus {
 }
 
 .data-table th {
-  background: #f8fafc;
+  background: #111e36;
   padding: 12px 16px;
   font-size: 12px;
   font-weight: 700;
@@ -208,59 +415,85 @@ input:focus, select:focus {
   vertical-align: middle;
 }
 
-.math-code {
-  font-family: Consolas, monospace;
-  background: #f8fafc;
-  padding: 4px 8px;
-  border-radius: 4px;
-  color: #0f172a;
-  border: 1px solid var(--border-light);
-}
-
+/* ==========================================================================
+   ESTILIZACIÓN DE LAS FÓRMULAS ALGEBRAICAS
+   ========================================================================== */
+.math-code,
 .sub-code {
-  font-family: Consolas, monospace;
-  color: var(--brand-accent);
-  background: var(--brand-accent-bg);
-  padding: 4px 8px;
-  border-radius: 4px;
+  font-family: 'Fira Code', Consolas, monospace;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.25s ease;
+  display: inline-block; /* Asegura un comportamiento dimensional predecible */
 }
 
-/* BLOQUE APARTE: ESTADÍSTICO DE PRUEBA TRATADO ESPECIAL */
+/* Caja de Fórmula Principal (Paleta Clara del Cristal Esmerilado) */
+.math-code {
+  background: var(--light-text-secondary);
+  color: var(--brand-accent);
+  border: 1px solid var(--light-border);
+}
+
+/* Caja de Sustitución Aritmética (Celeste Claro de la Tarjeta Flotante) */
+.sub-code {
+  background: rgba(14, 165, 233, 0.08);
+  color: var(--brand-accent);
+  border: 1px solid rgba(14, 165, 233, 0.2);
+}
+
+/* Efectos hover sutiles para los bloques matemáticos */
+.math-code:hover,
+.sub-code:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* BLOQUE DE ESTADÍSTICO DE PRUEBA TRATADO ESPECIAL EN MODO CLARO */
 .test-statistic-box {
-  background: #f8fafc;
-  border: 1px solid var(--brand-primary);
-  border-radius: 10px;
-  padding: 20px;
-  margin-top: 20px;
+  background: var(--bg-surface);
+  border: 1px solid var(--brand-accent);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.04),
+    0 1px 3px rgba(0, 0, 0, 0.02);
+  backdrop-filter: blur(8px);
 }
 
 .stat-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  padding-bottom: 12px;
 }
 
 .stat-header h3 {
   margin: 0;
-  font-size: 15px;
-  color: var(--brand-primary);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-main);
 }
 
 .stat-badge {
-  background: rgba(37, 99, 235, 0.1);
-  color: var(--brand-accent);
+  background: var(--brand-accent);
+  color: var(--bg-workspace);
   font-size: 11px;
   font-weight: 700;
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: 4px 12px;
+  border-radius: 50px;
+  border: 1px solid rgba(14, 165, 233, 0.15);
+  text-transform: uppercase;
 }
 
 .stat-body {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 30px;
+  flex-direction: column;
+  gap: 18px;
 }
 
 .stat-item {
@@ -271,30 +504,29 @@ input:focus, select:focus {
 
 .stat-label {
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--light-text-muted);
   text-transform: uppercase;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
-.math-code.large, .sub-code.large {
+.math-code.large,
+.sub-code.large {
   font-size: 15px;
-  padding: 6px 12px;
+  padding: 10px 14px;
 }
 
 .stat-result-block {
-  margin-left: auto;
-  text-align: right;
-  background: #fff;
-  padding: 10px 20px;
-  border: 1px solid var(--border-light);
-  border-radius: 8px;
+  margin-top: 10px;
+  padding-top: 20px;
+  border-top: 1px dashed rgba(15, 23, 42, 0.08);
 }
 
 .stat-huge-number {
-  font-family: monospace;
-  font-size: 28px;
+  font-family: 'Fira Code', monospace;
+  font-size: 36px;
   font-weight: 900;
-  color: var(--brand-primary);
+  color: var(--light-accent);
 }
 
 /* PANEL REPORTE FINAL CLÍNICO */
@@ -304,8 +536,8 @@ input:focus, select:focus {
 
 .report-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 30px;
+  grid-template-columns: 2fr 3fr;
+  gap: 24px;
 }
 
 .report-meta {
@@ -317,12 +549,15 @@ input:focus, select:focus {
 .meta-row {
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid #f1f5f9;
+  font-size: 13px;
+  padding: 10px;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .meta-row.highlight {
+  background: var(--brand-accent-bg);
+  border-radius: 6px;
+  border: 1px solid rgba(0, 210, 255, 0.15);
   color: var(--brand-accent);
   font-weight: 700;
 }
@@ -330,8 +565,10 @@ input:focus, select:focus {
 .report-verdict {
   background: var(--color-success-bg);
   padding: 20px;
-  border-radius: 8px;
-  border: 1px solid rgba(5, 150, 105, 0.15);
+  border-radius: 12px;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  display: flex;
+  flex-direction: column;
 }
 
 .verdict-title {
@@ -345,20 +582,423 @@ input:focus, select:focus {
 
 .verdict-text {
   margin: 0;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--color-success);
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
-/* AUXILIARES */
-.font-bold { font-weight: 700; }
-.text-right { text-align: right; }
-.text-dark { color: var(--brand-primary); }
-.font-mono { font-family: monospace; }
-.chart-wrapper { height: 350px; position: relative; }
+/* ==========================================================================
+   TARJETA FLOTANTE DE MÉTRICAS (DRAGGABLE / COLAPSABLE)
+   ========================================================================== */
+.floating-metrics-card {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 380px;
+  max-width: calc(100vw - 48px);
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 20px;
+  box-shadow:
+    0 4px 30px rgba(0, 0, 0, 0.03),
+    0 10px 40px rgba(15, 23, 42, 0.08);
+  z-index: 9999;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* 
+     CORRECCIÓN 3: Al hacer hover sobre la tarjeta o su contenido, 
+     desactivamos el 'overflow: hidden' para que el tooltip salga libremente.
+  */
+  overflow: hidden;
+  user-select: none;
+  touch-action: none;
+}
+
+.floating-metrics-card:hover {
+  overflow: visible !important;
+}
+
+.floating-metrics-card.is-dragging {
+  transform: scale(1.02);
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15);
+  border-color: rgba(6, 182, 212, 0.3);
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.floating-metrics-card.collapsed {
+  width: 220px;
+}
+
+.card-header-floating {
+  padding: 16px 20px;
+  background: rgba(241, 245, 249, 0.5);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: grab;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.card-header-floating:active {
+  cursor: grabbing;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-header-floating h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: 0.3px;
+}
+
+.pulse-indicator {
+  width: 8px;
+  height: 8px;
+  background-color: #06b6d4;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #000000;
+  animation: pulse 2s infinite;
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  font-size: 12px;
+  transition: color 0.2s;
+}
+
+.toggle-btn:hover {
+  color: #0f172a;
+}
+
+/* FORZAR VISIBILIDAD DE DATOS DENTRO DE LA TARJETA FLOTANTE CLARA */
+.floating-metrics-card table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  margin: 10px 0 !important;
+  background: rgba(255, 255, 255, 0.5) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+}
+
+.floating-metrics-card th {
+  background: rgba(15, 23, 42, 0.05) !important;
+  color: #0f172a !important;
+  font-weight: 700 !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  padding: 8px 10px !important;
+  text-align: left !important;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.1) !important;
+}
+
+.floating-metrics-card td {
+  color: #334155 !important;
+  font-size: 12px !important;
+  padding: 8px 10px !important;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.05) !important;
+  font-family: 'Fira Code', monospace !important;
+}
+
+.floating-metrics-card .two-means-data,
+.floating-metrics-card .comparison-table,
+.floating-metrics-card .means-comparison {
+  color: #0f172a !important;
+}
+
+.floating-metrics-card p,
+.floating-metrics-card span:not(.text-highlight),
+.floating-metrics-card div:not(.metric-box):not(.metric-box-sm):not(.metric-box-shared) {
+  color: #334155 !important;
+}
+
+.floating-metrics-card small {
+  color: #64748b !important;
+  font-size: 10px !important;
+}
+
+.card-body-floating {
+  padding: 18px;
+  max-height: 480px;
+  /* 
+     CORRECCIÓN 4: Cambiamos de 'overflow-y: auto' a 'visible' temporalmente
+     al hacer hover sobre el panel para evitar el recorte obligado de contenedores.
+  */
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.floating-metrics-card:hover .card-body-floating {
+  overflow: visible !important;
+}
+
+.section-title {
+  margin: 0 0 8px 0;
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.text-emerald {
+  color: #009b67;
+}
+
+.text-purple {
+  color: #6e0099;
+}
+
+.text-cyan {
+  color: #007385;
+}
+
+.api-section-split {
+  padding: 12px;
+  background: rgba(19, 50, 80, 0.05);
+  /* Sincronizado a un tono claro traslúcido */
+  border-radius: 12px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.border-emerald {
+  border-left: 4px solid #10b981;
+}
+
+.border-purple {
+  border-left: 4px solid #bf44ef;
+}
+
+.grid-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.metric-box,
+.metric-box-sm {
+  background: rgba(255, 255, 255, 0.8);
+  padding: 10px 12px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.metric-box-sm {
+  padding: 6px 10px;
+}
+
+.label {
+  font-size: 9px;
+  color: #64748b;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.value {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-top: 3px;
+  font-family: 'Fira Code', monospace;
+}
+
+.label-sm {
+  font-size: 8px;
+  color: #94a3b8;
+}
+
+.value-sm {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+  /* Corregido a color oscuro de alta visibilidad */
+  font-family: 'Fira Code', monospace;
+}
+
+.test-results-section {
+  border-top: 1px solid rgba(148, 163, 184, 0.15);
+  padding-top: 14px;
+}
+
+.metric-box-shared {
+  background: rgba(14, 165, 233, 0.06);
+  border: 1px solid rgba(14, 165, 233, 0.15);
+  padding: 10px 14px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.grid-shared {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.text-highlight {
+  color: #0284c7 !important;
+  font-size: 16px !important;
+}
+
+/* ==========================================================================
+   ESTILOS SENSITIVOS EN HOVER PARA LOS GLOBOS/LABEL EN FÓRMULAS (TOOLTIPS)
+   ========================================================================== */
+[data-tooltip] {
+  position: relative;
+  cursor: help;
+  /* 
+     CORRECCIÓN 5: Usamos inline-block y cambiamos de z-index: auto a z-index de capa.
+  */
+  display: inline-block;
+  z-index: 50; 
+}
+
+[data-tooltip]:hover {
+  /* 
+     CORRECCIÓN 6: Elevamos el elemento activo por encima de cualquier otro hermano 
+     de forma inmediata.
+  */
+  z-index: 999999 !important;
+}
+
+/* El globo del Tooltip - Estética Esmerilada Ultra Limpia */
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 130%; /* Ligeramente más alto para dar respiro visual */
+  left: 50%;
+  transform: translateX(-50%) scale(0.95);
+
+  /* Estilo Esmerilado Luminoso Sincronizado */
+  background: rgba(255, 255, 255, 0.98); /* Opaco al 98% para cobertura total de texto de fondo */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-left: 3px solid var(--color-success); /* Borde sutil pero contrastado */
+  box-shadow:
+    0 12px 30px -5px rgba(15, 23, 42, 0.25),
+    0 8px 16px -6px rgba(15, 23, 42, 0.15);
+
+  /* Tipografía Clara y Oscura para Máxima Legibilidad */
+  color: #0f172a;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  padding: 8px 12px;
+  border-radius: 8px;
+
+  white-space: normal;
+  width: max-content;
+  max-width: 260px;
+
+  /* 
+     CORRECCIÓN 7: Z-index masivo en combinación con pointer-events none
+     para asegurar que nada bloquee el tooltip y este no bloquee interacciones físicas.
+  */
+  z-index: 9999999 !important;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Flecha de Base para el Tooltip */
+[data-tooltip]::before {
+  content: '';
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  border-width: 6px;
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 0.98) transparent transparent transparent;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 9999999 !important;
+}
+
+/* Transiciones en hover */
+[data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+
+[data-tooltip]:hover::before {
+  opacity: 1;
+}
+
+/* Ocultar botones incrementales de inputs numéricos */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* ANIMACIONES */
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.7);
+  }
+
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(6, 182, 212, 0);
+  }
+
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(6, 182, 212, 0);
+  }
+}
+
+/* AUXILIARES / RESPONSIVE */
+.font-bold {
+  font-weight: 700;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-dark {
+  color: var(--text-main);
+}
+
+.font-mono {
+  font-family: monospace;
+}
 
 @media (max-width: 768px) {
-  .report-grid { grid-template-columns: 1fr; }
-  .stat-result-block { margin-left: 0; text-align: left; width: 100%; }
+  .report-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-result-block {
+    margin-left: 0;
+    text-align: left;
+    width: 100%;
+  }
 }
