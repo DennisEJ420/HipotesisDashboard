@@ -1,17 +1,34 @@
 <div class="dashboard">
   <!-- CABECERA PRINCIPAL -->
   <header class="dashboard-header">
-    <div class="brand">
-      <span class="brand-icon">⚡</span>
-      <h1>Análisis de Hipótesis</h1>
+    <div class="dashboard-header-title">
+      <span class="brand-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="20 70 540 250" style="width: 100%; height: 100%; display: block;">
+          <!-- Curva de Distribución 1 -->
+          <path d="M 50 300 Q 175 300 225 100 T 400 300" fill="none" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" opacity="0.4"/>
+          <circle cx="225" cy="100" r="12" fill="#FFFFFF" opacity="0.4"/>
+          
+          <!-- Curva de Distribución 2 -->
+          <path d="M 200 300 Q 325 300 375 100 T 550 300" fill="none" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round"/>
+          <circle cx="375" cy="100" r="12" fill="#FFFFFF"/>
+          
+          <!-- Vector de Hipótesis (Flecha) -->
+          <path d="M 245 100 L 350 100" fill="none" stroke="var(--brand-accent, #00E5FF)" stroke-width="8" stroke-dasharray="12 6"/>
+          <polygon points="350,90 370,100 350,110" fill="var(--brand-accent, #00E5FF)"/>
+          
+          <!-- Línea de Base (Eje X) -->
+          <line x1="20" y1="300" x2="560" y2="300" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" opacity="0.6"/>
+        </svg>
+      </span>
+      <h1>Sistema para Pruebas de Hipótesis</h1>
     </div>
-    <span class="badge">Módulo Estadístico</span>
+    <span class="badge">Módulo de Análisis Estadístico</span>
   </header>
 
   <!-- CONTROL DE PARÁMETROS -->
   <section class="control-panel card">
     <h2 class="card-title">Configuración del Experimento</h2>
-    
+
     <div class="form-grid">
       <div class="field">
         <label>Tipo de prueba</label>
@@ -28,13 +45,15 @@
 
       <div class="field">
         <label>Tamaño Muestral (n)</label>
-        <input type="number" [(ngModel)]="testConfig.sampleSize" placeholder="Ej. 50 (mínimo aconsejable > 30)" class="form-input">
+        <input type="number" [(ngModel)]="testConfig.sampleSize" placeholder="Ej. 50 (mínimo aconsejable > 30)"
+          class="form-input">
       </div>
 
       <!-- Visible solo en prueba de una media -->
       <div class="field" *ngIf="testConfig.type === 'one'">
         <label>Media Esperada (μ₀)</label>
-        <input type="number" [(ngModel)]="testConfig.populationMean" (change)="updateHypothesis()" placeholder="Ej. 200 (media teórica de H₀)" class="form-input">
+        <input type="number" [(ngModel)]="testConfig.populationMean" (change)="updateHypothesis()"
+          placeholder="Ej. 200 (media teórica de H₀)" class="form-input">
       </div>
 
       <div class="field">
@@ -84,7 +103,8 @@
           <span class="stream-count-badge">{{ result?.chart?.apiA?.length || 0 }} elementos</span>
         </div>
         <div class="stream-grid">
-          <div class="data-chip" *ngFor="let val of result?.chart?.apiA; let i = index" (mouseenter)="triggerChartHover(0, i)" (mouseleave)="clearChartHover()">
+          <div class="data-chip" *ngFor="let val of result?.chart?.apiA; let i = index"
+            (mouseenter)="triggerChartHover(0, i)" (mouseleave)="clearChartHover()">
             <span class="chip-index">[{{ (i + 1) | number:'2.0-0' }}]</span>
             <span class="chip-value">{{ val }}</span>
           </div>
@@ -98,7 +118,8 @@
           <span class="stream-count-badge">{{ result?.chart?.apiB?.length || 0 }} elementos</span>
         </div>
         <div class="stream-grid accent-b">
-          <div class="data-chip" *ngFor="let val of result?.chart?.apiB; let i = index" (mouseenter)="triggerChartHover(1, i)" (mouseleave)="clearChartHover()">
+          <div class="data-chip" *ngFor="let val of result?.chart?.apiB; let i = index"
+            (mouseenter)="triggerChartHover(1, i)" (mouseleave)="clearChartHover()">
             <span class="chip-index">[{{ (i + 1) | number:'2.0-0' }}]</span>
             <span class="chip-value">{{ val }}</span>
           </div>
@@ -127,9 +148,11 @@
             <tr *ngIf="!item.name.includes('Estadístico')">
               <td class="font-bold text-dark" style="display: flex; align-items: center; gap: 8px;">
                 <!-- Indicador Verde para la Muestra API A -->
-                <span *ngIf="item.apiGroup === 'A'" style="background-color: #10b981; width: 10px; height: 10px; display: inline-block; border-radius: 50%; flex-shrink: 0;"></span>
+                <span *ngIf="item.apiGroup === 'A'"
+                  style="background-color: #10b981; width: 10px; height: 10px; display: inline-block; border-radius: 50%; flex-shrink: 0;"></span>
                 <!-- Indicador Violeta para la Muestra API B -->
-                <span *ngIf="item.apiGroup === 'B'" style="background-color: #bf44ef; width: 10px; height: 10px; display: inline-block; border-radius: 50%; flex-shrink: 0;"></span>
+                <span *ngIf="item.apiGroup === 'B'"
+                  style="background-color: #bf44ef; width: 10px; height: 10px; display: inline-block; border-radius: 50%; flex-shrink: 0;"></span>
                 {{ item.name }}
               </td>
               <td>
@@ -160,7 +183,7 @@
               SE = {{ getSummaryValue('pooledStandardError') || '-' }}
             </code>
           </div>
-          
+
           <div class="stat-item">
             <span class="stat-label">Modelo matemático utilizado</span>
             <code class="math-code large formula-box" [attr.data-tooltip]="item.explanation">
@@ -188,15 +211,13 @@
         <div class="meta-row">
           <span>H₀ Planificada:</span>
           <strong>
-            {{ result.decision.h0.replace('less', '<').replace('greater', '>' ).replace('different', '≠' ) }} 
-          </strong>
+            {{ result.decision.h0.replace('less', '<').replace('greater', '>' ).replace('different', '≠' ) }} </strong>
         </div>
 
         <div class="meta-row">
           <span>H₁ Planificada:</span>
           <strong>
-            {{ result.decision.h1.replace('less', '<').replace('greater', '>' ).replace('different', '≠' ) }} 
-          </strong>
+            {{ result.decision.h1.replace('less', '<').replace('greater', '>' ).replace('different', '≠' ) }} </strong>
         </div>
 
         <div class="meta-row">
@@ -222,7 +243,8 @@
 <!-- TARJETA FLOTANTE DE MÉTRICAS (DRAGGABLE / COLAPSABLE) -->
 <!-- ========================================================================= -->
 <div *ngIf="result" #floatingCard class="floating-metrics-card" [class.collapsed]="floatingCardCollapsed">
-  <div class="card-header-floating" (mousedown)="onDragStart($event)" (touchstart)="onDragStart($event)" (click)="handleHeaderClick()">
+  <div class="card-header-floating" (mousedown)="onDragStart($event)" (touchstart)="onDragStart($event)"
+    (click)="handleHeaderClick()">
     <div class="header-title">
       <span class="pulse-indicator"></span>
       <h3>Estadísticos Clave</h3>

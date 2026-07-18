@@ -103,9 +103,9 @@ export function runOneSampleTest(
 
             pValue < alpha
 
-                ? 'Se rechaza H0'
+                ? 'Existen suficientes evidencias para Rechazar H0' //Sí se rechaza
 
-                : 'No se rechaza H0'
+                : 'No existen suficientes evidencias para Rechazar H0' //No se rechaza
 
 
     };
