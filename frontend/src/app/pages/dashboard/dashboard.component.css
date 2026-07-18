@@ -2,8 +2,6 @@
    SISTEMA DE DISEÑO HIGH-CLARITY (MODO OSCURO - AZUL NOCHE & CELESTE)
    ========================================================================== */
 
-   @import url('https://fonts.googleapis.com/css2?family=Calistoga&family=Clash+Display:wght@700&family=Plus+Jakarta+Sans:ital,wght@0,800;1,800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
-
 :host {
   /* Fondos de pantalla y contenedores */
   --bg-workspace: #070d19;      /* Azul noche profundo */
@@ -80,12 +78,11 @@ body {
 }
 
 .dashboard-header h1 {
-  font-family: "Space Grotesk", sans-serif;
   font-size: 26px;
   font-weight: 700;
   color: var(--text-main);
   margin: 0;
-  letter-spacing: -0.03em; /* Al cerrarla un poco, los detalles técnicos resaltan más */
+  letter-spacing: -0.03em;
   line-height: 1.2;
 }
 
