@@ -1,65 +1,20 @@
-import {
-    runTwoSampleTest
-} from './two-sample';
+import { runTwoSampleTest } from './two-sample';
+import { collectApiASamples, collectApiBSamples } from '../services/sample.service';
 
-
-
-const apiA = [
-
-    193, 216, 184, 181, 183,
-    185, 202, 202, 182, 194,
-    207, 213, 203, 189, 211,
-    213, 206, 190, 217, 219,
-    195, 199, 216, 183, 211,
-    190, 192, 185, 195, 191,
-    192, 190, 208, 187, 194,
-    209, 205, 196, 192, 194,
-    213, 201, 217, 181, 193,
-    205, 188, 190, 200, 197
-
-];
-
-
-
-const apiB = [
-
-    249, 241, 243, 249, 283,
-    253, 247, 283, 283, 247,
-    259, 237, 263, 256, 254,
-    239, 275, 262, 242, 244,
-    252, 283, 252, 258, 254,
-    266, 259, 249, 268, 243,
-    281, 241, 254, 236, 283,
-    277, 257, 237, 263, 273,
-    276, 259, 284, 250, 254,
-    281, 253, 271, 281, 240
-
-];
-
-
+// Generamos 30 muestras dinámicas
+const apiA = collectApiASamples(50); 
+const apiB = collectApiBSamples(50);
 
 const result = runTwoSampleTest(
-
     apiA,
-
     apiB,
-
     0.05
-
 );
 
-
-
 console.log(
-
     JSON.stringify(
-
         result,
-
         null,
-
         2
-
     )
-
 );

@@ -14,11 +14,11 @@ export function runHypothesis(req: Request, res: Response) {
     populationMean = 200,
     alternative = 'different',
     
-    // Parámetros dinámicos optimizados (API B es 25ms más lenta)
-    meanA = 200,
-    variationA = 15,
-    meanB = 225,
-    variationB = 15
+    //estrechamos la diferencia a solo 3ms para forzar el solapamiento
+    meanA = 197,
+    variationA = 12,
+    meanB = 200, 
+    variationB = 12
   } = req.body;
 
   if (!type) {
@@ -96,6 +96,9 @@ export function runHypothesis(req: Request, res: Response) {
       varianceB: result.sampleB.variance,
       deviationB: result.sampleB.standardDeviation,
       errorB: result.sampleB.standardError,
+
+      // Se añade el Error Estándar Combinado al JSON de respuesta
+      pooledStandardError: result.pooledStandardError || (result as any).pooledSE || null,
 
       tStudent: result.tStatistic
     };

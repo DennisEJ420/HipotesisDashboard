@@ -22,32 +22,13 @@ export function runStatisticalAudit(
     req: Request,
     res: Response
 ){
+    const sampleSize = 40; //
 
-    const sampleSize = 50;
+    const apiA = collectApiASamples(sampleSize, 198, 10);
+    const apiB = collectApiBSamples(sampleSize, 200, 10);
 
-    const apiA =
-        collectApiASamples(sampleSize);
-
-
-    const apiB =
-        collectApiBSamples(sampleSize);
-
-
-
-    const oneSampleA =
-        runOneSampleTest(
-            apiA,
-            200,
-            0.05
-        );
-
-
-    const twoSample =
-        runTwoSampleTest(
-            apiA,
-            apiB,
-            0.05
-        );
+    const oneSampleA = runOneSampleTest(apiA, 200, 0.05);
+    const twoSample = runTwoSampleTest(apiA, apiB, 0.05);
 
 
 

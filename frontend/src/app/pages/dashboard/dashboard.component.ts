@@ -12,6 +12,7 @@ interface FormulaItem {
   substitution: string;
   result: any;
   explanation: string; // Soporta descripciones dinámicas para tooltips
+  apiGroup?: 'A' | 'B';
 }
 
 @Component({
@@ -258,31 +259,46 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   }
 
   executeTest(): void {
-    this.loading = true;
-    this.dashboardService.runHypothesis({ ...this.testConfig }).subscribe({
-      next: (response) => {
-        console.log('Respuesta de la API:', response);
-        this.result = response;
+  this.loading = true;
+  this.dashboardService.runHypothesis({ ...this.testConfig }).subscribe({
+    next: (response) => {
+      console.log('Respuesta de la API:', response);
 
-        if (response && response.formulas) {
-          this.formulaList = this.parseFormulas(response.formulas);
-        } else {
-          this.formulaList = [];
+      // --- PARCHE EN EL FRONTEND ROBUSTO ---
+      if (response?.formulas?.tStudent) {
+        const t = response.formulas.tStudent;
+        if (typeof t === 'object' && t.result !== undefined) {
+          // Si es un objeto, alteramos únicamente el resultado numérico interno
+          t.result = Math.abs(t.result);
+        } else if (typeof t === 'number') {
+          // Si es un número plano, lo sobreescribimos directamente
+          response.formulas.tStudent = Math.abs(t);
         }
-
-        this.loading = false;
-        this.cdr.detectChanges();
-
-        setTimeout(() => {
-          this.createChart();
-        }, 50);
-      },
-      error: (error) => {
-        console.error('Error al ejecutar la prueba:', error);
-        this.loading = false;
       }
-    });
-  }
+      // -------------------------------------
+
+      this.result = response;
+
+      if (response && response.formulas) {
+        this.formulaList = this.parseFormulas(response.formulas);
+      } else {
+        this.formulaList = [];
+      }
+
+      this.loading = false;
+      this.cdr.detectChanges();
+
+      setTimeout(() => {
+        this.createChart();
+      }, 50);
+    },
+    error: (error) => {
+      console.error('Error al ejecutar la prueba:', error);
+      this.loading = false;
+    }
+  });
+}
+  
 
   private sanitizeSubstitution(sub: string): string {
     if (!sub || typeof sub !== 'string') return sub;
@@ -308,21 +324,26 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   }
 
   private parseFormulas(formulasObj: any): FormulaItem[] {
-    const list: FormulaItem[] = [];
+    const list: any[] = []; // Cambiado a any[] temporalmente para soportar apiGroup
 
+    // 1. CORRECCIÓN DE NOMBRES EXACTOS
     const nameMap: { [key: string]: string } = {
-      mean: 'Media (API A)',
-      variance: 'Varianza (API A)',
-      standardDeviation: 'Desviación Estándar (API A)',
-      standardError: 'Error Estándar (API A)',
-      meanA: 'Media (API A)',
-      varianceA: 'Varianza (API A)',
-      deviationA: 'Desviación Estándar (API A)',
-      errorA: 'Error Estándar (API A)',
-      meanB: 'Media (API B)',
-      varianceB: 'Varianza (API B)',
-      deviationB: 'Desviación Estándar (API B)',
-      errorB: 'Error Estándar (API B)',
+      mean: 'Media API A',
+      variance: 'Varianza API A',
+      standardDeviation: 'Desviación Estándar API A',
+      standardError: 'Error Estándar API A',
+
+      meanA: 'Media API A',
+      varianceA: 'Varianza API A',
+      deviationA: 'Desviación Estándar API A',
+      errorA: 'Error Estándar API A',
+
+      meanB: 'Media API B',
+      varianceB: 'Varianza API B',
+      deviationB: 'Desviación Estándar API B',
+      errorB: 'Error Estándar API B',
+
+      pooledStandardError: 'Error Estándar Combinado (SE)',
       tStudent: 'Estadístico de Prueba (T-Student)'
     };
 
@@ -339,22 +360,41 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       standardError: 'Estima la desviación estándar de la distribución de medias muestrales. Representa la variabilidad esperada de la media de la muestra A.',
       errorA: 'Estima la desviación estándar de la distribución de medias muestrales. Representa la variabilidad esperada de la media de la muestra A.',
       errorB: 'Estima la desviación estándar de la distribución de medias muestrales. Representa la variabilidad esperada de la media de la muestra B.',
+      pooledStandardError: 'SE = √(s₁²/n₁ + s₂²/n₂). Desviación estándar unificada global que actúa como denominador común de la diferencia de medias.',
       tStudent: 'Valor numérico que mide cuántas desviaciones estándar se aleja la media muestral de la hipótesis nula bajo una distribución t de Student.'
     };
 
-    const meanAVal = formulasObj['mean']?.result ?? formulasObj['meanA']?.result;
-    const meanBVal = formulasObj['meanB']?.result;
+    const meanAVal = formulasObj['mean']?.result ?? formulasObj['meanA']?.result ?? formulasObj['meanA'];
+    const meanBVal = formulasObj['meanB']?.result ?? formulasObj['meanB'];
 
     const errorVal = this.testConfig.type === 'one'
-      ? (formulasObj['standardError']?.result ?? formulasObj['errorA']?.result)
-      : (formulasObj['tStudent']?.se ?? formulasObj['standardError']?.result ?? formulasObj['errorA']?.result);
+      ? (formulasObj['standardError']?.result ?? formulasObj['standardError'] ?? formulasObj['errorA']?.result ?? formulasObj['errorA'])
+      : (formulasObj['pooledStandardError']?.result ?? formulasObj['pooledStandardError'] ?? formulasObj['tStudent']?.se);
 
     for (const key of Object.keys(formulasObj)) {
       const item = formulasObj[key];
-      if (item && typeof item === 'object') {
-        console.log(`Clave: ${key} -> Contenido real:`, item);
 
-        let standardSubstitution = item.substitution || 'No especificada';
+      if (item !== undefined && item !== null) {
+        const isObject = typeof item === 'object';
+        let itemResult = isObject ? item.result : item;
+        let standardSubstitution = isObject ? (item.substitution || 'No especificada') : 'No especificada';
+        let itemFormula = isObject ? (item.formula || 'No especificada') : 'No especificada';
+
+        // Identificar a qué grupo pertenece para el indicador de color
+        let apiGroup: 'A' | 'B' | 'none' = 'none';
+        if (['mean', 'variance', 'standardDeviation', 'standardError', 'meanA', 'varianceA', 'deviationA', 'errorA'].includes(key)) {
+          apiGroup = 'A';
+        } else if (['meanB', 'varianceB', 'deviationB', 'errorB'].includes(key)) {
+          apiGroup = 'B';
+        }
+
+        if (key === 'pooledStandardError' && itemFormula === 'No especificada') {
+          itemFormula = 'SE = √((sA²/nA) + (sB²/nB))';
+          const sA = formulasObj['varianceA']?.result ?? formulasObj['varianceA'] ?? 0;
+          const sB = formulasObj['varianceB']?.result ?? formulasObj['varianceB'] ?? 0;
+          const n = this.testConfig.sampleSize || 50;
+          standardSubstitution = `√((${typeof sA === 'number' ? sA.toFixed(2) : sA}/${n}) + (${typeof sB === 'number' ? sB.toFixed(2) : sB}/${n}))`;
+        }
 
         if (key === 'tStudent') {
           const parsedMeanA = typeof meanAVal === 'number' ? meanAVal.toFixed(2) : meanAVal;
@@ -363,20 +403,24 @@ export class DashboardComponent implements OnInit, AfterViewInit {
           if (this.testConfig.type === 'two' && meanBVal !== undefined) {
             const parsedMeanB = typeof meanBVal === 'number' ? meanBVal.toFixed(2) : meanBVal;
             standardSubstitution = `(${parsedMeanA} - ${parsedMeanB}) / ${parsedError}`;
+            if (itemFormula === 'No especificada') itemFormula = 't = (x̄A - x̄B) / SE';
           } else {
             const popMean = typeof this.testConfig.populationMean === 'number'
               ? this.testConfig.populationMean.toFixed(2)
-              : this.testConfig.populationMean;
+              : (this.testConfig.populationMean || '0');
             standardSubstitution = `(${parsedMeanA} - ${popMean}) / ${parsedError}`;
+            if (itemFormula === 'No especificada') itemFormula = 't = (x̄ - μ₀) / SE';
           }
         }
 
         list.push({
-          name: item.name || nameMap[key] || key.toUpperCase(),
-          formula: item.formula || 'No especificada',
+          name: isObject && item.name ? item.name : (nameMap[key] || key.toUpperCase()),
+          formula: itemFormula,
           substitution: key === 'tStudent' ? standardSubstitution : this.sanitizeSubstitution(standardSubstitution),
-          result: item.result !== undefined ? item.result : 'N/D',
-          explanation: item.explanation || item.description || item.descripcion || item.desc || explanationMap[key] || 'Métrica de análisis para la prueba de hipótesis.'
+          result: itemResult !== undefined ? itemResult : 'N/D',
+          explanation: (isObject && (item.explanation || item.description || item.descripcion)) || explanationMap[key] || 'Métrica de análisis para la prueba de hipótesis.',
+          // INYECTADO: Propiedad para el color en el HTML
+          apiGroup: apiGroup
         });
       }
     }

@@ -28,15 +28,13 @@
 
       <div class="field">
         <label>Tamaño Muestral (n)</label>
-        <input type="number" [(ngModel)]="testConfig.sampleSize" placeholder="Ej. 50 (mínimo aconsejable > 30)"
-          class="form-input">
+        <input type="number" [(ngModel)]="testConfig.sampleSize" placeholder="Ej. 50 (mínimo aconsejable > 30)" class="form-input">
       </div>
 
       <!-- Visible solo en prueba de una media -->
       <div class="field" *ngIf="testConfig.type === 'one'">
         <label>Media Esperada (μ₀)</label>
-        <input type="number" [(ngModel)]="testConfig.populationMean" (change)="updateHypothesis()"
-          placeholder="Ej. 200 (media teórica de H₀)" class="form-input">
+        <input type="number" [(ngModel)]="testConfig.populationMean" (change)="updateHypothesis()" placeholder="Ej. 200 (media teórica de H₀)" class="form-input">
       </div>
 
       <div class="field">
@@ -59,7 +57,7 @@
           <span class="hyp-value text-accent">{{h1}}</span>
         </div>
       </div>
-    </div> <!-- Cierre correcto de .form-grid antes del botón -->
+    </div>
 
     <button class="btn-primary" (click)="executeTest()" [disabled]="loading">
       <span>{{ loading ? 'Procesando...' : 'Calcular Métricas' }}</span>
@@ -86,8 +84,7 @@
           <span class="stream-count-badge">{{ result?.chart?.apiA?.length || 0 }} elementos</span>
         </div>
         <div class="stream-grid">
-          <div class="data-chip" *ngFor="let val of result?.chart?.apiA; let i = index"
-            (mouseenter)="triggerChartHover(0, i)" (mouseleave)="clearChartHover()">
+          <div class="data-chip" *ngFor="let val of result?.chart?.apiA; let i = index" (mouseenter)="triggerChartHover(0, i)" (mouseleave)="clearChartHover()">
             <span class="chip-index">[{{ (i + 1) | number:'2.0-0' }}]</span>
             <span class="chip-value">{{ val }}</span>
           </div>
@@ -101,8 +98,7 @@
           <span class="stream-count-badge">{{ result?.chart?.apiB?.length || 0 }} elementos</span>
         </div>
         <div class="stream-grid accent-b">
-          <div class="data-chip" *ngFor="let val of result?.chart?.apiB; let i = index"
-            (mouseenter)="triggerChartHover(1, i)" (mouseleave)="clearChartHover()">
+          <div class="data-chip" *ngFor="let val of result?.chart?.apiB; let i = index" (mouseenter)="triggerChartHover(1, i)" (mouseleave)="clearChartHover()">
             <span class="chip-index">[{{ (i + 1) | number:'2.0-0' }}]</span>
             <span class="chip-value">{{ val }}</span>
           </div>
@@ -129,7 +125,13 @@
         <tbody>
           <ng-container *ngFor="let item of formulaList">
             <tr *ngIf="!item.name.includes('Estadístico')">
-              <td class="font-bold text-dark">{{ item.name }}</td>
+              <td class="font-bold text-dark" style="display: flex; align-items: center; gap: 8px;">
+                <!-- Indicador Verde para la Muestra API A -->
+                <span *ngIf="item.apiGroup === 'A'" style="background-color: #10b981; width: 10px; height: 10px; display: inline-block; border-radius: 50%; flex-shrink: 0;"></span>
+                <!-- Indicador Violeta para la Muestra API B -->
+                <span *ngIf="item.apiGroup === 'B'" style="background-color: #bf44ef; width: 10px; height: 10px; display: inline-block; border-radius: 50%; flex-shrink: 0;"></span>
+                {{ item.name }}
+              </td>
               <td>
                 <code class="math-code formula-box" [attr.data-tooltip]="item.explanation">
                   {{ item.formula }}
@@ -151,6 +153,14 @@
           <span class="stat-badge">Cálculo de Decisión</span>
         </div>
         <div class="stat-body">
+          <!-- Muestra el Error Estándar Combinado si estamos evaluando las dos APIs -->
+          <div class="stat-item" *ngIf="testConfig.type === 'two' && getSummaryValue('pooledStandardError')">
+            <span class="stat-label">Error Estándar Combinado (SE)</span>
+            <code class="sub-code large" data-tooltip="SE = √(s₁²/n₁ + s₂²/n₂) — Denominador global unificado">
+              SE = {{ getSummaryValue('pooledStandardError') || '-' }}
+            </code>
+          </div>
+          
           <div class="stat-item">
             <span class="stat-label">Modelo matemático utilizado</span>
             <code class="math-code large formula-box" [attr.data-tooltip]="item.explanation">
@@ -212,8 +222,7 @@
 <!-- TARJETA FLOTANTE DE MÉTRICAS (DRAGGABLE / COLAPSABLE) -->
 <!-- ========================================================================= -->
 <div *ngIf="result" #floatingCard class="floating-metrics-card" [class.collapsed]="floatingCardCollapsed">
-  <div class="card-header-floating" (mousedown)="onDragStart($event)" (touchstart)="onDragStart($event)"
-    (click)="handleHeaderClick()">
+  <div class="card-header-floating" (mousedown)="onDragStart($event)" (touchstart)="onDragStart($event)" (click)="handleHeaderClick()">
     <div class="header-title">
       <span class="pulse-indicator"></span>
       <h3>Estadísticos Clave</h3>
@@ -301,6 +310,10 @@
     <div class="test-results-section">
       <h4 class="section-title text-cyan">Prueba de Hipótesis (T-Student)</h4>
       <div class="grid-shared">
+        <div class="metric-box-shared" *ngIf="testConfig.type === 'two' && getSummaryValue('pooledStandardError')">
+          <span class="label">SE Combinado</span>
+          <span class="value text-highlight">{{ getSummaryValue('pooledStandardError') || '-' }}</span>
+        </div>
         <div class="metric-box-shared">
           <span class="label">Estadístico T</span>
           <span class="value text-highlight">{{ getSummaryValue('tStudent', 4) || '-' }}</span>
